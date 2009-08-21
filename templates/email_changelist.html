@@ -1,0 +1,39 @@
+{% extends "base_webfaction.html" %}
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
+{% block innercontent %}
+    <ul class="object-tools">
+        <li>
+            <a class="addlink" href="add/">Add Email</a>
+        </li>
+    </ul>
+    <table cellspacing="0" style="margin-top: 20px;">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Email</th>
+                <th>Auto-responder</th>
+                <th>Spam protection</th>
+                <th>Redirects to</th>
+            </tr>
+        </thead>
+        {% for email in emails %}
+            <tr class="{% cycle 'row1' 'row2' %}">
+                <td>&nbsp;</td>
+                <td>
+                    <a href="{{email.id}}">{{email.email_address}}</a>
+                </td>
+                <td>
+                    {{email.autoresponder_on}}
+                </td>
+                <td>
+                    {{email.mailbox.enable_spam_protection}}
+                </td>
+                <td>
+                    {{email.redirect}}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
