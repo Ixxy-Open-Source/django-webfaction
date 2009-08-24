@@ -10,3 +10,5 @@ class Log(models.Model):
     user = models.ForeignKey(User)
     action = models.TextField(max_length=256)
     timestamp = models.DateTimeField(auto_now_add=True)
+    def __unicode__(self):
+        return self.action

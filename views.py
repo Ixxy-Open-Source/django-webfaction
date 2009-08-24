@@ -31,12 +31,12 @@ def email_changelist(request):
 def email_changeform(request, id=None):
     if request.method == 'POST':
         form = EmailForm(request.POST)
+        change = False
         if form.is_valid():
             f = form.cleaned_data
             server = xmlrpclib.Server('https://api.webfaction.com/')
             session_id, account = server.login(settings.WEBFACTION_USERNAME, settings.WEBFACTION_PASSWORD)
             if id == None:
-                change = False
                 if f['create_mailbox']:
                     mailbox_name = generate_mailbox_name(f['email_address'])
                     targets = generate_targets(mailbox_name, f['redirect'])

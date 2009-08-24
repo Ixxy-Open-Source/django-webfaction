@@ -10,6 +10,8 @@ class EmailOptions (admin.ModelAdmin):
 
 class LogOptions (admin.ModelAdmin):
     name="Email"
+    list_display = ('action', 'user', 'timestamp', )
+    list_filter = ('user', 'timestamp', )
     
 try:
     admin.site.register(Email, EmailOptions)
