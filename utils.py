@@ -3,6 +3,11 @@ import xmlrpclib
 from django.conf import settings
 
 def get_email_accounts():
+    # Gets all the email addresses for this account and then filters them down to just the ones that:
+    # 1. Match a domain in settings.WEBFACTION_DOMAINS
+    # 2. Aren't catchall
+    # 3. If there is a mailbox target, make sure it matches a valid prefix
+    # It then sets 'mailbox' and 'redirect' keys based on the content of 'targets'
     server = xmlrpclib.Server('https://api.webfaction.com/')
     session_id, account = server.login(settings.WEBFACTION_USERNAME, settings.WEBFACTION_PASSWORD)
     emails = server.list_emails(session_id)
@@ -33,7 +38,7 @@ def get_email_accounts():
 
 def generate_mailbox_name(email_address):
     email_name, domain = email_address.split('@')
-    return settings.WEBFACTION_DOMAINS[domain]+email_name.replace('.','_')
+    return settings.WEBFACTION_DOMAINS[domain]+email_name.replace('.','_').replace('-','_')
     
 def generate_targets(mailbox, redirect):
     targets = []

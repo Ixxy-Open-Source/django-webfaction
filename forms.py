@@ -5,7 +5,6 @@ from utils import generate_mailbox_name
 
 class EmailForm(forms.Form):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput)
-    #email_address = ReadOnlyField()
     email_address = forms.EmailField()
     email_address_prev = forms.EmailField(required=False, widget=forms.HiddenInput)
     create_mailbox = forms.BooleanField(initial=True, required=False, help_text="Uncheck this if you only want to redirect and not access this account directly.")
@@ -19,6 +18,7 @@ class EmailForm(forms.Form):
     autoresponder_message_prev = forms.CharField(required=False, widget=forms.HiddenInput)
     enable_spam_protection = forms.BooleanField(required=False, help_text="Mark suspected spam with a hidden tag that you can use to filter the messages in your email software. Only works via a mailbox - not redirected mail.")
     enable_spam_protection_prev = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    mailbox_prev = forms.CharField(required=False, widget=forms.HiddenInput)
     def __init__(self, *args, **kwargs):
         super(EmailForm, self).__init__(*args, **kwargs)
         if self.data.get('email_address', None): # If this field already exists it should be readonly

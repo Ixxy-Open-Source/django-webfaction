@@ -30,6 +30,7 @@ def email_changelist(request):
 @staff_member_required
 def email_changeform(request, id=None):
     if request.method == 'POST':
+        # Submitting the form
         form = EmailForm(request.POST)
         change = False
         if form.is_valid():
@@ -37,17 +38,14 @@ def email_changeform(request, id=None):
             server = xmlrpclib.Server('https://api.webfaction.com/')
             session_id, account = server.login(settings.WEBFACTION_USERNAME, settings.WEBFACTION_PASSWORD)
             if id == None:
+                # Creating a new email
                 if f['create_mailbox']:
                     mailbox_name = generate_mailbox_name(f['email_address'])
+                    password = server.create_mailbox(session_id, mailbox_name, f['enable_spam_protection'])['password']
                     targets = generate_targets(mailbox_name, f['redirect'])
-                    if not(settings.WEBFACTION_TEST):
-                        password = server.create_mailbox(session_id, mailbox_name, f['enable_spam_protection'])['password']
-                    else:
-                        password = 'test'
                 else:
                     targets = generate_targets(None, f['redirect'])
-                if not(settings.WEBFACTION_TEST):
-                    server.create_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'])
+                server.create_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'])
                 email_msg = "Created email address %s" % f['email_address']
                 l = Log(user=request.user, action=email_msg)
                 l.save()
@@ -62,6 +60,7 @@ def email_changeform(request, id=None):
                     l.save()
                     request.user.message_set.create(message=password_msg)
             else:
+                # Editing an existing email
                 change = True
                 messages = []
                 update_email = False
@@ -78,24 +77,22 @@ def email_changeform(request, id=None):
                     messages.append("Redirect Address for %s changed from '%s' to '%s'" % (f['email_address'], f['redirect_prev'], f['redirect']))
                     update_email = True
                 if update_email:
-                    mailbox_name = generate_mailbox_name(f['email_address'])
+                    mailbox_name = f.get('mailbox_prev', None)
                     targets = generate_targets(mailbox_name, f['redirect'])
-                    if not(settings.WEBFACTION_TEST):
-                        server.update_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'])
+                    server.update_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'])
                 if f['enable_spam_protection']!=f['enable_spam_protection_prev']:
-                    mailbox_name = generate_mailbox_name(f['email_address'])
-                    if not(settings.WEBFACTION_TEST):
-                        try:
-                            server.update_mailbox(session_id, mailbox_name, f['enable_spam_protection'])
-                            messages.append("Spam Protection Status for %s changed to %s" % (f['enable_spam_protection'], f['email_address']))
-                        except xmlrpclib.Fault: #Probably means this is a redirect only address
-                            messages.append("Error. Can only change spam protection status on addresses with their own mailbox")
+                    try:
+                        server.update_mailbox(session_id, mailbox_name, f['enable_spam_protection'])
+                        messages.append("Spam Protection Status for %s changed to %s" % (f['enable_spam_protection'], f['email_address']))
+                    except xmlrpclib.Fault: #Probably means this is a redirect only address
+                        messages.append("Error. Can only change spam protection status on addresses with their own mailbox")
                 for msg in messages:
                     request.user.message_set.create(message=msg)
                     l = Log(user=request.user, action=msg)
                     l.save()
             return HttpResponseRedirect('..')
     else:
+        # Blank form
         if id==None: # We are creating
             change = False
             form = EmailForm()
@@ -104,9 +101,15 @@ def email_changeform(request, id=None):
             email_accounts = get_email_accounts()
             email_account = [x for x in email_accounts if x['id']==int(id)][0] # Assume only one match
             if email_account.get('mailbox', None):
+                # Has a mailbox
                 enable_spam_protection = email_account['mailbox']['enable_spam_protection']
             else:
+                # Is just a redirect
                 enable_spam_protection = False
+            if email_account.get('mailbox', False):
+                mailbox_name = email_account['mailbox']['mailbox']
+            else:
+                mailbox_name = ''
             form = EmailForm({
                 'email_address': email_account['email_address'],
                 'email_address_prev': email_account['email_address'],
@@ -119,6 +122,7 @@ def email_changeform(request, id=None):
                 'enable_spam_protection': enable_spam_protection,
                 'enable_spam_protection_prev': enable_spam_protection ,
                 'create_mailbox': email_account.get('mailbox', False),
+                'mailbox_prev' : mailbox_name,
                 'redirect': email_account.get('redirect', ''),
                 'redirect_prev': email_account.get('redirect', ''),
             })
