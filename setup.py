@@ -18,7 +18,7 @@ setup(
         'django-webfaction',
     ],
     package_data={
-        'linkcheck': [
+        'django-webfaction': [
             'templates/*.html',
         ]
     },
