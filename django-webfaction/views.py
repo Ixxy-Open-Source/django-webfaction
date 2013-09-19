@@ -79,7 +79,7 @@ def email_changeform(request, id=None):
                 if update_email:
                     mailbox_name = f.get('mailbox_prev', None)
                     targets = generate_targets(mailbox_name, f['redirect'])
-                    server.update_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'])
+                    server.update_email(session_id, f['email_address'], targets, f['autoresponder_on'], f['autoresponder_subject'], f['autoresponder_message'], f['email_address'])
                 if f['enable_spam_protection']!=f['enable_spam_protection_prev']:
                     try:
                         server.update_mailbox(session_id, mailbox_name, f['enable_spam_protection'])
