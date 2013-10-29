@@ -1,4 +1,7 @@
-from django.conf.urls.defaults import *
+try:
+    from django.conf.urls.defaults import *
+except:
+    from django.conf.urls import *
 
 urlpatterns = patterns('django-webfaction.views',  
     url(r'^email/add/$', 'email_changeform'),
