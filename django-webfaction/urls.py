@@ -1,5 +1,5 @@
 try:
-    from django.conf.urls.defaults import *
+    from django.conf.urls import *
 except:
     from django.conf.urls import *
 
