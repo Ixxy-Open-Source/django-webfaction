@@ -5,7 +5,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='django-webfaction-email',
+    name='django_webfaction_email',
     version='0.5',
     description="A Django app to provide a simple admin interface"
                 "to Webfaction's email account API.",
@@ -15,10 +15,10 @@ setup(
     license='BSD',
     url='http://github.com/andybak/django-webfaction/',
     packages=[
-        'django-webfaction',
+        'django_webfaction_email',
     ],
     package_data={
-        'django-webfaction': [
+        'django_webfaction_email': [
             'templates/*.html',
         ]
     },
