@@ -2,8 +2,8 @@ from django.contrib.admin.sites import AlreadyRegistered
 from django.contrib import admin
 from django.conf import settings
 
-from models import Email
-from models import Log
+from .models import Email
+from .models import Log
 
 class EmailOptions (admin.ModelAdmin):
     name="Email"

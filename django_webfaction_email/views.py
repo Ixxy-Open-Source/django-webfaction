@@ -1,4 +1,4 @@
-import xmlrpclib
+import xmlrpc.client
 
 from django.conf import settings
 from django.contrib import messages
@@ -8,12 +8,12 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import never_cache
 
-from forms import EmailForm
-from utils import generate_mailbox_name
-from utils import generate_targets
-from utils import get_email_accounts
+from .forms import EmailForm
+from .utils import generate_mailbox_name
+from .utils import generate_targets
+from .utils import get_email_accounts
 
-from models import Log
+from .models import Log
 
 
 @never_cache
@@ -40,7 +40,7 @@ def email_changeform(request, id=None):
         if form.is_valid():
 
             f = form.cleaned_data
-            server = xmlrpclib.Server('https://api.webfaction.com/')
+            server = xmlrpc.client.Server('https://api.webfaction.com/')
             session_id, account = server.login(settings.WEBFACTION_USERNAME, settings.WEBFACTION_PASSWORD)
 
             if id is None:
@@ -64,14 +64,14 @@ def email_changeform(request, id=None):
                     f['autoresponder_subject'],
                     f['autoresponder_message'],
                 )
-                email_msg = u"Created email address {}".format(f['email_address'])
+                email_msg = "Created email address {}".format(f['email_address'])
                 l = Log(user=request.user, action=email_msg)
                 l.save()
                 messages.info(request, email_msg)
 
                 if f['create_mailbox']:
-                    mailbox_msg = u"Created mailbox {}".format(mailbox_name)
-                    password_msg = mailbox_msg + u" with password {}".format(password)
+                    mailbox_msg = "Created mailbox {}".format(mailbox_name)
+                    password_msg = mailbox_msg + " with password {}".format(password)
                     if settings.WEBFACTION_LOG_PASSWORD:
                         l = Log(user=request.user, action=password_msg)
                     else:
@@ -86,14 +86,14 @@ def email_changeform(request, id=None):
                 update_email = False
 
                 if f['autoresponder_on'] != f['autoresponder_on_prev']:
-                    message_list.append(u"Autoresponder Status for {} changed to {}".format(
+                    message_list.append("Autoresponder Status for {} changed to {}".format(
                         f['email_address'],
                         f['autoresponder_on']),
                     )
                     update_email = True
 
                 if f['autoresponder_subject'] != f['autoresponder_subject_prev']:
-                    message_list.append(u"Autoresponder Subject for {} changed from '{}' to '{}'".format(
+                    message_list.append("Autoresponder Subject for {} changed from '{}' to '{}'".format(
                         f['email_address'],
                         f['autoresponder_subject_prev'],
                         f['autoresponder_subject']),
@@ -101,7 +101,7 @@ def email_changeform(request, id=None):
                     update_email = True
 
                 if f['autoresponder_message'] != f['autoresponder_message_prev']:
-                    message_list.append(u"Autoresponder Message for {} changed from '{}' to '{}'".format(
+                    message_list.append("Autoresponder Message for {} changed from '{}' to '{}'".format(
                         f['email_address'],
                         f['autoresponder_message_prev'],
                         f['autoresponder_message']),
@@ -109,7 +109,7 @@ def email_changeform(request, id=None):
                     update_email = True
 
                 if f['redirect'] != f['redirect_prev']:
-                    message_list.append(u"Redirect Address for {} changed from '{}' to '{}'".format(
+                    message_list.append("Redirect Address for {} changed from '{}' to '{}'".format(
                         f['email_address'],
                         f['redirect_prev'],
                         f['redirect']),
@@ -138,10 +138,10 @@ def email_changeform(request, id=None):
                             f['email_address']),
                         )
 
-                    except xmlrpclib.Fault:  # Probably means this is a redirect only address
+                    except xmlrpc.client.Fault:  # Probably means this is a redirect only address
 
                         message_list.append(
-                            u"Error. Can only change spam protection status on addresses with their own mailbox"
+                            "Error. Can only change spam protection status on addresses with their own mailbox"
                         )
 
                 for msg in message_list:

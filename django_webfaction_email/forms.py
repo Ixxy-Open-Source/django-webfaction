@@ -1,7 +1,7 @@
 from django.conf import settings
 from django import forms
 
-from utils import generate_mailbox_name
+from .utils import generate_mailbox_name
 
 class EmailForm(forms.Form):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput)
@@ -26,7 +26,7 @@ class EmailForm(forms.Form):
             self.fields['email_address'].widget.attrs['style'] = 'border: 0; color: #888;' # Naughty - mixing CSS with Python...
     def clean_email_address(self):
         data = self.cleaned_data['email_address']
-        if not(data.split('@')[1] in settings.WEBFACTION_DOMAINS.keys()):
+        if not(data.split('@')[1] in list(settings.WEBFACTION_DOMAINS.keys())):
             raise forms.ValidationError("Domain name not recognized") #TODO email address should be just the prefix and domain should be a ChoiceField
         mailbox_name_length = len(generate_mailbox_name(data))
         if mailbox_name_length>32:

@@ -1,4 +1,4 @@
-import xmlrpclib
+import xmlrpc.client
 
 from django.conf import settings
 
@@ -8,12 +8,12 @@ def get_email_accounts():
     # 2. Aren't catchall
     # 3. If there is a mailbox target, make sure it matches a valid prefix
     # It then sets 'mailbox' and 'redirect' keys based on the content of 'targets'
-    server = xmlrpclib.Server('https://api.webfaction.com/')
+    server = xmlrpc.client.Server('https://api.webfaction.com/')
     session_id, account = server.login(settings.WEBFACTION_USERNAME, settings.WEBFACTION_PASSWORD)
     emails = server.list_emails(session_id)
     mailboxes = server.list_mailboxes(session_id)
     email_accounts = []
-    for domain in settings.WEBFACTION_DOMAINS.keys():
+    for domain in list(settings.WEBFACTION_DOMAINS.keys()):
         email_accounts += [x for x in emails if x['email_address'].endswith(domain)]
     valid_email_accounts = []
     for email in email_accounts:
@@ -21,7 +21,7 @@ def get_email_accounts():
         domain = email['email_address'].split('@')[1]
         prefix = settings.WEBFACTION_DOMAINS[domain]
         if len(targets)>2:
-            raise Exception, "This app currently only supports one redirect and one mailbox. Please correct via control panel."
+            raise Exception("This app currently only supports one redirect and one mailbox. Please correct via control panel.")
         for target in targets:
             valid = False
             if '@' in target:
