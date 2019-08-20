@@ -9,7 +9,7 @@ class Email(models.Model):
         managed = False #Requires Django 1.1
 
 class Log(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.TextField(max_length=256)
     timestamp = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):

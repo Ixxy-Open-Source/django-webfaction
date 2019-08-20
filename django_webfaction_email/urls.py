@@ -1,10 +1,8 @@
-try:
-    from django.conf.urls.defaults import *
-except:
-    from django.conf.urls import *
+from django.conf.urls import url
+import django_webfaction_email.views
 
-urlpatterns = patterns('django_webfaction_email.views',  
-    url(r'^email/add/$', 'email_changeform'),
-    url(r'^email/(?P<id>\d+)/$', 'email_changeform'),
-    url(r'^email/$', 'email_changelist'),
-)
+urlpatterns = [
+    url(r'^email/add/$', django_webfaction_email.views.email_changeform),
+    url(r'^email/(?P<id>\d+)/$', django_webfaction_email.views.email_changeform),
+    url(r'^email/$', django_webfaction_email.views.email_changelist),
+]
