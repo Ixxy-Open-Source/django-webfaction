@@ -6,6 +6,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
 
 from .forms import EmailForm
@@ -195,8 +196,10 @@ def email_changeform(request, id=None):
             })
             del form.fields['create_mailbox']
 
-    return render_to_response(
-        'email_changeform.html',
-        {'change': change, 'form': form},
-        RequestContext(request),
+    context = {'change': change, 'form': form}
+    template = 'email_changeform.html'
+    return TemplateResponse(
+        request,
+        template,
+        context,
     )
